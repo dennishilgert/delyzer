@@ -1,0 +1,185 @@
+{
+  "stopID": "5006056",
+  "x": "9.17314",
+  "y": "48.77628",
+  "mapName": "WGS84[DD.ddddd]",
+  "area": "1",
+  "platform": "2",
+  "platformName": "Gleis 2",
+  "stopName": "Stadtmitte",
+  "nameWO": "Stadtmitte",
+  "pointType": "Gleis",
+  "countdown": "1",
+  "dateTime": {
+    "year": "2023",
+    "month": "4",
+    "day": "17",
+    "weekday": "2",
+    "hour": "20",
+    "minute": "16"
+  },
+  "realDateTime": {
+    "year": "2023",
+    "month": "4",
+    "day": "17",
+    "weekday": "2",
+    "hour": "20",
+    "minute": "17"
+  },
+  "realtimeTripStatus": "MONITORED",
+  "servingLine": {
+    "key": "1304",
+    "code": "2",
+    "number": "S6",
+    "symbol": "S6",
+    "motType": "1",
+    "mtSubcode": "0",
+    "realtime": "1",
+    "direction": "Weil der Stadt",
+    "directionFrom": "Schwabstraße",
+    "trainNum": "7660",
+    "name": "S-Bahn",
+    "delay": "1",
+    "liErgRiProj": {
+      "line": "10006",
+      "project": "j23",
+      "direction": "R",
+      "supplement": " ",
+      "network": "vvs",
+      "gid": "de:vvs:10006_:"
+    },
+    "destID": "5001303",
+    "stateless": "vvs:10006: :R:j23",
+    "lineDisplay": "line"
+  },
+  "operator": {
+    "code": "10",
+    "name": "DB",
+    "publicCode": "Bahn"
+  },
+  "stopInfos": None,
+  "lineInfos": [
+    {
+      "infoLinkText": "Hauptbahnhof - Vaihingen: Fahrplanänderungen in 26 Nächten Montag/Dienstag wegen der Instandhaltungsarbeiten",
+      "infoLinkURL": "http://noHost",
+      "infoText": {
+        "content": "Auch im Jahr 2023 müssen wieder planmäßige Instandhaltungsarbeiten an der Stammstrecke zwischen Hauptbahnhof (tief) und Vaihingen durchgeführt werden.\n\\nIn 26 Nächten von Montag auf Dienstag kommt es jeweils zwischen 22:30 und 04:30 zu folgenden Fahrplanänderungen bei der S-Bahn:\n\\nDie Linie S1 wird zwischen Hauptbahnhof (oben) und Vaihingen ohne Halt umgeleitet. Die S3 fährt nur zwischen Backnang und Hauptbahnhof (oben), die S4 zwischen Backnang bzw. Marbach und Hauptbahnhof (oben) und die S6 zwischen Weil der Stadt und Hauptbahnhof (oben). Die S2 und S5 fahren durch den S-Bahn-Tunnel zu geänderten Fahrzeiten.",
+        "subtitle": "Hauptbahnhof - Vaihingen: Fahrplanänderungen in 26 Nächten Montag/Dienstag wegen der Instandhaltungsarbeiten",
+        "subject": "Linien S1, S2, S3, S4, S5, S6",
+        "additionalText": "",
+        "htmlText": "<div>Auch im Jahr 2023 m&uuml;ssen wieder planm&auml;&szlig;ige Instandhaltungsarbeiten an der Stammstrecke zwischen Hauptbahnhof (tief) und Vaihingen durchgef&uuml;hrt werden.</div>\n<div>&nbsp;</div>\n<div>In 26 N&auml;chten von Montag auf Dienstag kommt es jeweils zwischen 22:30 und 04:30 zu folgenden Fahrplan&auml;nderungen bei der S-Bahn:</div>\n<div>&nbsp;</div>\n<div>Die Linie S1 wird zwischen Hauptbahnhof (oben) und Vaihingen ohne Halt umgeleitet. Die S3 f&auml;hrt nur zwischen Backnang und Hauptbahnhof (oben), die S4 zwischen Backnang bzw. Marbach und Hauptbahnhof (oben) und die S6 zwischen Weil der Stadt und Hauptbahnhof (oben). Die S2 und S5 fahren durch den S-Bahn-Tunnel zu ge&auml;nderten Fahrzeiten.</div>",
+        "wmlText": "",
+        "smsText": "Linien S1, S2, S3, S4, S5, S6",
+        "speechText": ""
+      },
+      "paramList": [
+        {
+          "type": "addInfoParam",
+          "name": "publisher",
+          "value": "ems.comm.addinfo",
+          "edit": "0"
+        },
+        {
+          "type": "addInfoParam",
+          "name": "infoType",
+          "value": "lineInfo",
+          "edit": "0"
+        },
+        {
+          "type": "system",
+          "name": "infoID",
+          "value": "ems-5780",
+          "edit": "0"
+        },
+        {
+          "type": "system",
+          "name": "seqID",
+          "value": "1734209",
+          "edit": "0"
+        },
+        {
+          "type": "addInfoParam",
+          "name": "priority",
+          "value": "normal",
+          "edit": "0"
+        },
+        {
+          "type": "messageSubType",
+          "name": "timetableChange",
+          "value": "lines",
+          "edit": "0"
+        }
+      ],
+      "attachments": [
+        {
+          "ID": "0",
+          "type": "application/pdf",
+          "path": "https://ems.vvs.de/s/oLEZu",
+          "virtPath": "https://ems.vvs.de/s/oLEZu",
+          "linkText": "Bauinfo Instandhaltungsfenster Stammstrecke Jahresfahrplan 2023.pdf",
+          "linkTarget": "_blank",
+          "size": "775719"
+        }
+      ]
+    },
+    {
+      "infoLinkText": "Feuerbach: Fahrplanänderungen wegen Bauarbeiten",
+      "infoLinkURL": "http://noHost",
+      "infoText": {
+        "content": "Vom 24. März bis 28. April 2023 werden in Feuerbach Arbeiten an der Oberleitung durchgeführt. Es kommt zu folgenden Fahrplanänderungen:\n\\nAm 25. März und 15. April verkehren die S4 und S5 nur alle 30 Minuten. Es fahren die Züge der S4 Marbach ab Minute 21 und 51, Schwabstraße ab Minute 2 und 32, der S5 Bietigheim ab Minute 7 und 37 und Schwabstraße ab Minute 22 und 52.\n\\nDie S6 fährt jeweils von Freitag 23:00 bis Sonntag Betriebsschluss nur zwischen Weil der Stadt und Zuffenhausen.\n\\nMontags bis donnerstags entfallen jeweils zwischen 23:00 Uhr und Betriebsschluss bei der S4 und S5 die Halte in Feuerbach Richtung Zuffenhausen. Die S6 verkehrt zu diesen Zeiten nur zwischen Weil der Stadt und Zuffenhausen.",
+        "subtitle": "Feuerbach: Fahrplanänderungen wegen Bauarbeiten",
+        "subject": "Linien S4, S5, S6, S60",
+        "additionalText": "",
+        "htmlText": "<div>Vom 24. M&auml;rz bis 28. April 2023 werden in Feuerbach Arbeiten an der Oberleitung durchgef&uuml;hrt. Es kommt zu folgenden Fahrplan&auml;nderungen:</div>\n<div>&nbsp;</div>\n<div>Am 25. M&auml;rz und 15. April verkehren die S4 und S5 nur alle 30 Minuten. Es fahren die Z&uuml;ge der S4 Marbach ab Minute 21 und 51, Schwabstra&szlig;e ab Minute 2 und 32, der S5 Bietigheim ab Minute 7 und 37 und Schwabstra&szlig;e ab Minute 22 und 52.</div>\n<div>&nbsp;</div>\n<div>Die S6 f&auml;hrt jeweils von Freitag 23:00 bis Sonntag Betriebsschluss nur zwischen Weil der Stadt und Zuffenhausen.</div>\n<div>&nbsp;</div>\n<div>Montags bis donnerstags entfallen jeweils zwischen 23:00 Uhr und Betriebsschluss bei der S4 und S5 die Halte in Feuerbach Richtung Zuffenhausen. Die S6 verkehrt zu diesen Zeiten nur zwischen Weil der Stadt und Zuffenhausen.</div>",
+        "wmlText": "",
+        "smsText": "Linien S4, S5, S6, S60",
+        "speechText": ""
+      },
+      "paramList": [
+        {
+          "type": "addInfoParam",
+          "name": "publisher",
+          "value": "ems.comm.addinfo",
+          "edit": "0"
+        },
+        {
+          "type": "addInfoParam",
+          "name": "infoType",
+          "value": "lineInfo",
+          "edit": "0"
+        },
+        {
+          "type": "system",
+          "name": "infoID",
+          "value": "ems-6374",
+          "edit": "0"
+        },
+        {
+          "type": "system",
+          "name": "seqID",
+          "value": "4148701",
+          "edit": "0"
+        },
+        {
+          "type": "addInfoParam",
+          "name": "priority",
+          "value": "normal",
+          "edit": "0"
+        },
+        {
+          "type": "messageSubType",
+          "name": "timetableChange",
+          "value": "lines",
+          "edit": "0"
+        }
+      ]
+    }
+  ],
+  "tripInfos": None,
+  "attrs": [
+    {
+      "name": "AVMSTripID",
+      "value": "7660-800643-8006698-201200"
+    }
+  ]
+}
