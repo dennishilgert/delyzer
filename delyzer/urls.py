@@ -21,5 +21,6 @@ from delyzer import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('departures/', views.departure_list),
-    path('departures/<int:id>', views.departure_detail)
+    path('departures/<int:id>', views.departure_detail),
+    path('lines/', views.lines),
 ]

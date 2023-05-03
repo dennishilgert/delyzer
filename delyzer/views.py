@@ -1,12 +1,14 @@
+import json
 from .models import Departure
 from .serializers import DepartureSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework import status
+import pandas as pd
 
 
-@api_view('GET')
+@api_view(['GET'])
 def departure_list(request):
 
     """departure_list
@@ -29,9 +31,8 @@ def departure_list(request):
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-        
 
-@api_view('GET')
+@api_view(['GET'])
 def departure_detail(request, id: int):
 
     """departure_list
@@ -39,7 +40,7 @@ def departure_detail(request, id: int):
         * GET: returns a departures by its id
 
     Args:
-            id (number): Departure _ID
+            id (number): Departure_ID
 
     Returns:
         _type_: HttpResponse
@@ -49,12 +50,53 @@ def departure_detail(request, id: int):
         * Test that the API returns a 404 error if the ID doesn't exist.
         * Test that the API returns the expected data for the departure.
     """
-    try:
-        departure = Departure.objects.get(pk=id)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    
     if request.method == 'GET':
+        departure = Departure.objects.get(pk=id)
+
         serializer = DepartureSerializer(departure)
         return JsonResponse(serializer.data)
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+def lines(request):
+
+    """departure_list
+    description:
+        * GET: returns a list of all departures
+
+    Args:
+            id (number): Departure_ID
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns the correct departure for a given ID.
+        * Test that the API returns a 404 error if the ID doesn't exist.
+        * Test that the API returns the expected data for the departure.
+    """
+    
+    if request.method == 'GET':
+        lines = pd.DataFrame(Departure.objects.values('line_number',
+       'id',
+      'direction',
+      'line_name',
+      'planned_departure_time'))
+        lines = lines.drop_duplicates(subset=['line_number','direction'])
+        lines = lines.sort_values(['line_number','direction'])
+        lines = lines[['line_number','direction']]
+        print(lines)
+        lines = lines.to_dict('records')
+        print(type(lines))
+
+
+        print(lines)
+        return JsonResponse({'lines':lines})
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
