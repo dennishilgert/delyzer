@@ -10,7 +10,6 @@ class Swapper:
         for attr_name in dir(self.plotter):
             attr = getattr(self.plotter, attr_name)
             if callable(attr) and not attr_name.startswith("__"):
-                print(attr)
                 self.plots.append(attr)
         self.func_pointer = len(self.plots)
 
