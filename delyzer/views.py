@@ -154,9 +154,9 @@ def delay_at_time(request):
       'planned_departure_time'))
         delay['planned_departure_time'] = delay['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
         delay.set_index('planned_departure_time', inplace=True)
-        delay = delay['delay'].resample('30min').mean().round(2).reset_index()
+        delay = delay['delay'].resample('30min').mean().round(2).reset_index().ffill()
         print(delay)
-        delay['delay'] = delay['delay'].astype(int)
+        delay['delay'] = delay['delay']
         delay.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
 
         delay = delay.to_dict('records')
