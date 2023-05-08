@@ -11,10 +11,11 @@ class Plotter(PlotterInterface):
 
     def __init__(self, ax):
         self.ax = ax
+        self.dataGetter = vvsData()
 
     def plot_avg_line_delay(self):
-        data = vvsData.get_avg_line_delay()
-        line_and_delay = [(obj.name, obj.delay) for obj in data]
+        data = self.dataGetter.get_avg_line_delay()
+        line_and_delay = [(obj.line_number, obj.delay) for obj in data]
         line_delay_dict = {}
         for line, delay in line_and_delay:
             if line in line_delay_dict:
@@ -32,11 +33,34 @@ class Plotter(PlotterInterface):
         self.ax.set_title("Durchschnittliche Verspätung")
         self.ax.set_xlabel("Linie")
         self.ax.set_ylabel("Verspätung in Minuten")
-        plt.show()
+        self.ax.figure.canvas.draw()
+
+
+    def plot_avg_station_delay(self):
+        data = self.dataGetter.get_avg_line_delay()
+        line_and_delay = [(obj.line_number, obj.delay) for obj in data]
+        line_delay_dict = {}
+        for line, delay in line_and_delay:
+            if line in line_delay_dict:
+                line_delay_dict[line].append(delay)
+            else:
+                line_delay_dict[line] = [delay]
+        line_and_avg_delay = []
+        for line, delays in line_delay_dict.items():
+            avg_delay = sum(delays) / len(delays)
+            line_and_avg_delay.append((line, avg_delay))
+        line_and_avg_delay.sort(key=lambda x: x[1])
+        x = [line for line, _ in line_and_avg_delay]
+        y = [avg_delay for _, avg_delay in line_and_avg_delay]
+        self.ax.bar(x, y)
+        self.ax.set_title("Durchschnittliche Verspätung")
+        self.ax.set_xlabel("Linie")
+        self.ax.set_ylabel("Verspätung in Minuten")
+        self.ax.figure.canvas.draw()
 
 
     def plot_avg_time_delay(self):
-        data = vvsData.get_avg_time_delay()
+        data = self.dataGetter.get_avg_time_delay()
         x_values = [datetime.datetime.fromtimestamp(obj.time) for obj in data]
         y_values = [t.delay for t in data]
 
@@ -57,4 +81,4 @@ class Plotter(PlotterInterface):
         self.ax.set_title('Delay over Time')
 
         # Diagramm anzeigen
-        plt.show()
+        self.ax.figure.canvas.draw()

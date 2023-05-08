@@ -23,6 +23,7 @@ class MainWindow:
 
         self.swapper = Swapper(self.ax)
         self.swapper.call_left_func()  #as initial plot call
+        plt.show()    # needed to make .draw functions work
 
     def left_button_clicked(self, event):
         self.ax.clear()
