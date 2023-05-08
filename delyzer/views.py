@@ -117,7 +117,7 @@ def lines_by_delay(request):
       'direction',
       'delay',
       'line_name'))
-        delay = delay.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(0)
+        delay = delay.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(2)
         delay = delay.sort_values('delay', ascending=False)
         print(delay)
         delay = delay.to_dict('records')
@@ -154,9 +154,9 @@ def delay_at_time(request):
       'planned_departure_time'))
         delay['planned_departure_time'] = delay['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
         delay.set_index('planned_departure_time', inplace=True)
-        delay = delay['delay'].resample('30min').mean().round(0).reset_index()
+        delay = delay['delay'].resample('30min').mean().round(2).reset_index().ffill()
         print(delay)
-        delay['delay'] = delay['delay'].astype(int)
+        delay['delay'] = delay['delay']
         delay.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
 
         delay = delay.to_dict('records')
@@ -164,5 +164,69 @@ def delay_at_time(request):
 
         print(delay)
         return JsonResponse({'times':[delay]})
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def delay_at_station(request):
+
+    """departure_list
+    description:
+        * GET: returns a list of all delays of trains
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        delay = pd.DataFrame(Departure.objects.values('id',
+        'station_id',
+      'delay'))
+        delay = delay.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
+        delay = delay.sort_values('delay', ascending=False)
+        print(delay)
+        delay = delay.to_dict('records')
+        print(type(delay))
+
+
+        print(delay)
+        return JsonResponse({'delays':delay})
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def delay_at_station(request):
+
+    """departure_list
+    description:
+        * GET: returns a list of all delays of trains
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        delay = pd.DataFrame(Departure.objects.values('id',
+        'station_id',
+      'delay'))
+        delay = delay.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
+        delay = delay.sort_values('delay', ascending=False)
+        print(delay)
+        delay = delay.to_dict('records')
+        print(type(delay))
+
+
+        print(delay)
+        return JsonResponse({'delays':delay})
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
