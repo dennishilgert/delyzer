@@ -1,20 +1,35 @@
 from datetime import datetime
 import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-from matplotlib.dates import HourLocator, DateFormatter
 from data_exporter import vvsData
 from interface.plotter_interface import PlotterInterface
-from models.avg_time_delay_data import AvgTimeDelay
+from logger import setup_logger
 
 
 class Plotter(PlotterInterface):
 
     def __init__(self, ax):
         self.ax = ax
-        self.dataGetter = vvsData()
+        self.data_getter = vvsData()
+        self.logger = setup_logger()
 
     def plot_avg_line_delay(self):
-        data = self.dataGetter.get_avg_line_delay()
+        """
+    Plots the average delay per line using the data from the dataGetter.
+
+    Args:
+        Uses ax from the MainWindow
+
+    Side Effects:
+        * Retrieves average line delay data using the dataGetter.
+        * Plots the average delay per line using matplotlib.
+        * Sets the title, x-axis label, and y-axis label of the plot.
+
+    Tests:
+        * Test that the function correctly plots the average delay per line.
+        * Test that the x-axis labels correspond to the line numbers.
+        * Test that the y-axis values represent the average delay in minutes.
+    """
+        data = self.data_getter.get_avg_line_delay()
         line_and_delay = [(obj.line_number, obj.delay) for obj in data]
         line_delay_dict = {}
         for line, delay in line_and_delay:
@@ -34,10 +49,26 @@ class Plotter(PlotterInterface):
         self.ax.set_xlabel("Linie")
         self.ax.set_ylabel("Verspätung in Minuten")
         self.ax.figure.canvas.draw()
+        self.logger.info('Ploted line delay data')
 
 
     def plot_avg_station_delay(self):
-        data = self.dataGetter.get_avg_station_delay()
+        """
+        Plots the average delay per station using the data from the dataGetter.
+
+        Args:
+            Uses ax from the MainWindow
+
+        Side Effects:
+            * Retrieves average station delay data using the dataGetter.
+            * Plots the average delay per station using matplotlib.
+
+        Tests:
+            * Test that the function correctly plots the average delay per station.
+            * Test that the x-axis labels correspond to the station IDs.
+            * Test that the y-axis values represent the average delay in minutes.
+        """
+        data = self.data_getter.get_avg_station_delay()
         station_and_delay = [(obj.station, obj.delay) for obj in data]
         station_delay_dict = {}
         for station, delay in station_and_delay:
@@ -59,12 +90,28 @@ class Plotter(PlotterInterface):
         self.ax.set_xlabel("Station")
         self.ax.set_ylabel("Verspätung in Minuten")
         self.ax.figure.canvas.draw()
+        self.logger.info('Ploted station delay data')
 
 
 
     def plot_avg_time_delay(self):
-        
-        data = self.dataGetter.get_avg_time_delay()
+        """
+        Plots the average delay over the course of a day, with data points for each half-hour increment.
+
+        Args:
+            uses ax from the MainWindow
+
+        Side Effects:
+            * Plots the average delay over the course of a day using matplotlib.
+            * Sets the title, x-axis label, and y-axis label of the plot.
+            * Configures the x-axis ticks to display in 3-hour intervals and formats the tick labels.
+
+        Tests:
+            * Test that the function correctly plots the average delay over the course of a day.
+            * Test that the x-axis ticks are displayed in 3-hour intervals.
+            * Test that the x-axis tick labels are formatted correctly ("HH:MM").
+        """
+        data = self.data_getter.get_avg_time_delay()
         time_and_delay = [(datetime.strptime(obj.time, '%Y-%m-%dT%H:%M:%S'), obj.delay) for obj in data]
 
         time_and_delay.sort(key=lambda x: x[0])  # Sortiere nach Zeit, um sicherzustellen, dass die Daten in der richtigen Reihenfolge angezeigt werden
@@ -88,3 +135,4 @@ class Plotter(PlotterInterface):
         self.ax.tick_params(axis='x', rotation=45)
 
         self.ax.figure.canvas.draw()
+        self.logger.info('Ploted time delay data')
