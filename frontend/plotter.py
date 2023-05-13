@@ -2,15 +2,14 @@ from datetime import datetime
 import matplotlib.dates as mdates
 from data_exporter import vvsData
 from interface.plotter_interface import PlotterInterface
-from logger import setup_logger
 
 
 class Plotter(PlotterInterface):
 
-    def __init__(self, ax):
+    def __init__(self, ax, logger):
         self.ax = ax
-        self.data_getter = vvsData()
-        self.logger = setup_logger()
+        self.data_getter = vvsData(logger)
+        self.logger = logger
 
     def plot_avg_line_delay(self):
         """

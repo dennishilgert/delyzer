@@ -47,7 +47,7 @@ class MainWindow:
         self.left_button.on_clicked(self.left_button_clicked)
         self.right_button.on_clicked(self.right_button_clicked)
 
-        self.swapper = Swapper(self.ax)
+        self.swapper = Swapper(self.ax, self.logger)
         self.swapper.call_left_func()  #as initial plot call
         plt.show()    # needed to make .draw functions work
         self.logger.info('Closed window')

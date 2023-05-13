@@ -22,15 +22,15 @@ class vvsData:
         * Test if error occures if the endpoint cant be found.
     """
 
-    def __init__(self):
+    def __init__(self, logger):
         self.url = "http://127.0.0.1:8000/"
-        self.logger = setup_logger()
+        self.logger = logger
 
     def get_avg_line_delay(self) -> List[AvgLineDelay]:
         self.logger.info('Get line data')
         response = requests.get(self.url + "delay/lines", timeout=10)
         if response.status_code == 200:
-            print("Anfrage erfolgreich")
+            self.logger.info('Request to backend was successful')
             data = response.json()
             delay_data = data['delays']
             try:
@@ -47,7 +47,7 @@ class vvsData:
         self.logger.info('Get station data')
         response = requests.get(self.url + "delay/stations", timeout=10)
         if response.status_code == 200:
-            print("Anfrage erfolgreich")
+            self.logger.info('Request to backend was successful')
             data = response.json()
             delay_data = data['delays']
             try:
@@ -65,7 +65,7 @@ class vvsData:
         self.logger.info('Get time data')
         response = requests.get(self.url + "delay/times", timeout=10)
         if response.status_code == 200:
-            print("Anfrage erfolgreich")
+            self.logger.info('Request to backend was successful')
             data = response.json()
             delay_data = data['times']
             print(delay_data)
