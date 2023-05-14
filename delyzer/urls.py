@@ -23,6 +23,7 @@ urlpatterns = [
     path('departures/', views.departure_list),
     path('departures/<int:id>', views.departure_detail),
     path('lines/', views.lines),
+    path('stations/', views.stations),
     path('delay/lines', views.lines_by_delay),
     path('delay/times', views.delay_at_time),
     path('delay/stations', views.delay_at_station),

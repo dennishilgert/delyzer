@@ -108,6 +108,42 @@ def lines(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
+def stations(request):
+
+    """departure_list
+    description:
+        * GET: returns a list of all lines
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        try:
+            stations_df = pd.DataFrame(Departure.objects.values('station_id'))
+            stations_df = stations_df.drop_duplicates(subset='station_id')
+            stations_df = stations_df.reset_index(drop = True)
+            
+            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
+            stations_df = stations_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+
+            stations_df = stations_df['Name mit Ort']
+            logger.info(stations_df)
+            stations_dict = stations_df.to_dict()
+
+            logger.info(stations_dict)
+            return JsonResponse({'stations':stations_dict})
+        except Exception as e:
+            logger.info(e)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
 def lines_by_delay(request):
 
     """departure_list
@@ -297,7 +333,7 @@ def propability_at_station(request, station: str):
 
 
             logger.info(delay_dic)
-            return JsonResponse({'delays':delay_dic})
+            return JsonResponse({'propability':delay_dic})
         except Exception as e:
             logger.info(e)
     else:
@@ -339,7 +375,7 @@ def propability_at_stations(request):
 
 
             logger.info(delay_dic)
-            return JsonResponse({'delays':delay_dic})
+            return JsonResponse({'propability':delay_dic})
         except Exception as e:
             logger.info(e)
     else:
