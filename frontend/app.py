@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 from swapper import Swapper
@@ -49,7 +51,7 @@ class MainWindow:
 
         self.swapper = Swapper(self.ax, self.logger)
         self.swapper.call_left_func()  #as initial plot call
-        
+
         plt.show()  
         self.logger.info('Closed window')
 
