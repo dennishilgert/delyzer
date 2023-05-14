@@ -27,7 +27,8 @@ urlpatterns = [
     path('delay/lines', views.lines_by_delay),
     path('delay/times', views.delay_at_time),
     path('delay/stations', views.delay_at_station),
-    path('propability/line/<str:station>', views.propability_at_station),
     path('propability/lines', views.propability_at_stations),
+    path('propability/lines/<str:station>', views.propability_at_station),
+
     
 ]
