@@ -41,7 +41,7 @@ python manage.py createsuperuser      # Create the superuser account for /admin 
 ## Collect data
 
 ```bash
-python manage.py collect_data [--station-id <station-id> OR --line <line-name>] --limit <limit>
+python manage.py collect_data [--observe-station <station-id> OR --observe-line <line-name>] --clear <true|false>
 ```
 
 ## Useful commands
