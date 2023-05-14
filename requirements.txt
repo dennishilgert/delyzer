@@ -28,3 +28,5 @@ tzdata==2023.3
 urllib3==1.26.15
 vvspy==1.2.0
 wrapt==1.15.0
+matplotlib==3.7.1
+requests==2.28.2

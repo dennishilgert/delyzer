@@ -51,7 +51,7 @@ class vvsData:
             data = response.json()
             delay_data = data['delays']
             try:
-                avg_station_delays = [AvgStationDelay(item['station_id'], item['delay']) for item in delay_data]
+                avg_station_delays = [AvgStationDelay(item['Station'], item['delay']) for item in delay_data]
             except ValueError:
                 self.logger.error('Failed to create AvgStationDelay list. Propably wrong data format.')
             return avg_station_delays

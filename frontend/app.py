@@ -42,21 +42,22 @@ class MainWindow:
         right_button_ax = self.figure.add_axes([0.7, 0.05, 0.1, 0.075])
 
         #Set buttons
-        self.left_button = Button(left_button_ax, 'Left')
-        self.right_button = Button(right_button_ax, 'Right')
+        self.left_button = Button(left_button_ax, 'Zurück')
+        self.right_button = Button(right_button_ax, 'Weiter')
         self.left_button.on_clicked(self.left_button_clicked)
         self.right_button.on_clicked(self.right_button_clicked)
 
         self.swapper = Swapper(self.ax, self.logger)
         self.swapper.call_left_func()  #as initial plot call
-        plt.show()    # needed to make .draw functions work
+        
+        plt.show()  
         self.logger.info('Closed window')
 
     def left_button_clicked(self,event):
         """
         Change plot.
 
-        Args:
+        Args: 
             event (_type_): _description_
         
         Tests:
