@@ -30,8 +30,8 @@ def departure_list(request):
 
     if request.method == 'GET':
         try:
-            departures = Departure.objects.all()
-            serializer = DepartureSerializer(departures, many=True)
+            departures_data = Departure.objects.all()
+            serializer = DepartureSerializer(departures_data, many=True)
             return JsonResponse({'departures':serializer.data})
         except Exception as e:
             logger.info(e)
@@ -42,7 +42,7 @@ def departure_list(request):
 @api_view(['GET'])
 def departure_detail(request, id: int):
 
-    """departure_list
+    """departure_detail
     description:
         * GET: returns a departures by its id
 
@@ -60,9 +60,9 @@ def departure_detail(request, id: int):
     
     if request.method == 'GET':
         try:
-            departure = Departure.objects.get(pk=id)
+            departure_data = Departure.objects.get(pk=id)
 
-            serializer = DepartureSerializer(departure)
+            serializer = DepartureSerializer(departure_data)
             return JsonResponse(serializer.data)
         except Exception as e:
             logger.info(e)
@@ -73,7 +73,7 @@ def departure_detail(request, id: int):
 @api_view(['GET'])
 def lines(request):
 
-    """departure_list
+    """lines
     description:
         * GET: returns a list of all lines
 
@@ -88,20 +88,22 @@ def lines(request):
     
     if request.method == 'GET':
         try:
-            lines = pd.DataFrame(Departure.objects.values('line_number',
-        'id',
-        'direction',
-        'line_name'))
-            lines = lines.drop_duplicates(subset=['line_number','direction'])
-            lines = lines.sort_values(['line_number','direction'])
-            lines = lines[['line_number','direction']]
-            logger.info(lines)
-            lines = lines.to_dict('records')
-            logger.info(type(lines))
+            lines_data = Departure.objects.values('line_number',
+            'id',
+            'direction',
+            'line_name')
 
+            lines_df = pd.DataFrame(lines_data)
 
-            logger.info(lines)
-            return JsonResponse({'lines':lines})
+            lines_df = lines_df.drop_duplicates(subset=['line_number','direction'])
+            lines_df = lines_df.sort_values(['line_number','direction'])
+
+            lines_df_selection = lines_df[['line_number','direction']]
+            
+            lines_dict = lines_df_selection.to_dict('records')
+            
+            return JsonResponse({'lines':lines_dict})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -110,9 +112,9 @@ def lines(request):
 @api_view(['GET'])
 def stations(request):
 
-    """departure_list
+    """stations
     description:
-        * GET: returns a list of all lines
+        * GET: returns a list of all stations
 
     Returns:
         _type_: HttpResponse
@@ -126,18 +128,19 @@ def stations(request):
     if request.method == 'GET':
         try:
             stations_df = pd.DataFrame(Departure.objects.values('station_id'))
-            stations_df = stations_df.drop_duplicates(subset='station_id')
-            stations_df = stations_df.reset_index(drop = True)
+
+            stations_df_unique = stations_df.drop_duplicates(subset='station_id')
+            stations_df_unique = stations_df_unique.reset_index(drop = True)
             
             stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            stations_df = stations_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+            stations_df_unique = stations_df_unique.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
 
-            stations_df = stations_df['Name mit Ort']
-            logger.info(stations_df)
-            stations_dict = stations_df.to_dict()
+            stations_df_sub = stations_df_unique['Name mit Ort']
 
-            logger.info(stations_dict)
+            stations_dict = stations_df_sub.to_dict()
+
             return JsonResponse({'stations':stations_dict})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -146,7 +149,7 @@ def stations(request):
 @api_view(['GET'])
 def lines_by_delay(request):
 
-    """departure_list
+    """lines_by_delay
     description:
         * GET: returns a list of all delays of trains
 
@@ -161,20 +164,58 @@ def lines_by_delay(request):
     
     if request.method == 'GET':
         try:
-            delay = pd.DataFrame(Departure.objects.values('line_number',
-        'id',
-        'direction',
-        'delay',
-        'line_name'))
-            delay = delay.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(2)
-            delay = delay.sort_values('delay', ascending=False)
-            logger.info(delay)
-            delay = delay.to_dict('records')
-            logger.info(type(delay))
+            delay_df = pd.DataFrame(Departure.objects.values('line_number',
+            'id',
+            'direction',
+            'delay',
+            'line_name'))
 
+            delay_df = delay_df.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(2)
+            delay_df = delay_df.sort_values('delay', ascending=False)
+            
+            delay_dict = delay_df.to_dict('records')
 
-            logger.info(delay)
-            return JsonResponse({'delays':delay})
+            return JsonResponse({'delays':delay_dict})
+        
+        except Exception as e:
+            logger.info(e)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+api_view(['GET'])
+def line_by_delay(request, line, direction):
+
+    """lines_by_delay
+    description:
+        * GET: returns a list of all delays of trains
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        try:
+            delay_df = pd.DataFrame(Departure.objects.values('line_number',
+            'id',
+            'direction',
+            'delay',
+            'line_name'))
+            
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+
+            delay_df = delay_df.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(2)
+            delay_df = delay_df.sort_values('delay', ascending=False)
+
+            delay_dict = delay_df.to_dict('records')
+
+            return JsonResponse({'delays':delay_dict})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -183,7 +224,7 @@ def lines_by_delay(request):
 @api_view(['GET'])
 def delay_at_time(request):
 
-    """departure_list
+    """delay_at_time
     description:
         * GET: returns a list of all delays of trains
 
@@ -198,33 +239,33 @@ def delay_at_time(request):
     
     if request.method == 'GET':
         try:
-            delay = pd.DataFrame(Departure.objects.values('line_number',
-        'id',
-        'direction',
-        'delay',
-        'line_name',
-        'planned_departure_time'))
-            delay['planned_departure_time'] = delay['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
-            delay.set_index('planned_departure_time', inplace=True)
-            delay = delay['delay'].resample('30min').mean().round(2).reset_index().ffill()
-            logger.info(delay)
-            delay['delay'] = delay['delay']
-            delay.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
-
-            delay = delay.to_dict('records')
+            delay_df = pd.DataFrame(Departure.objects.values('line_number',
+            'id',
+            'direction',
+            'delay',
+            'line_name',
+            'planned_departure_time'))
             
+            delay_df['planned_departure_time'] = delay_df['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
+            delay_df.set_index('planned_departure_time', inplace=True)
 
-            logger.info(delay)
-            return JsonResponse({'times':[delay]})
+            delay_df = delay_df['delay'].resample('30min').mean().round(2).reset_index().ffill()
+            
+            delay_df.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
+
+            delay_dict = delay_df.to_dict('records')
+            
+            return JsonResponse({'times':[delay_dict]})
+        
         except Exception as e:
             logger.info(e)
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
-def delay_at_station(request):
+def line_delay_at_time(request, line, direction):
 
-    """departure_list
+    """delay_at_time
     description:
         * GET: returns a list of all delays of trains
 
@@ -239,17 +280,73 @@ def delay_at_station(request):
     
     if request.method == 'GET':
         try:
-            delay = pd.DataFrame(Departure.objects.values('id',
-            'station_id',
-        'delay'))
-            delay = delay.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
-            delay = delay.sort_values('delay', ascending=False)
-            logger.info(delay)
-            delay = delay.to_dict('records')
-            logger.info(type(delay))
+            delay_df = pd.DataFrame(Departure.objects.values('line_number',
+            'id',
+            'direction',
+            'delay',
+            'line_name',
+            'planned_departure_time'))
+            
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
 
-            logger.info(delay)
-            return JsonResponse({'delays':delay})
+            delay_df['planned_departure_time'] = delay_df['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
+            delay_df.set_index('planned_departure_time', inplace=True)
+
+            delay_df = delay_df['delay'].resample('30min').mean().round(2).reset_index().ffill()
+            
+            delay_df.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
+
+            delay_dict = delay_df.to_dict('records')
+            
+            return JsonResponse({'times':[delay_dict]})
+        
+        except Exception as e:
+            logger.info(e)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+    
+@api_view(['GET'])
+def line_delay_at_station(request, line, direction):
+
+    """delay_at_station
+    description:
+        * GET: returns a list of all delays of trains
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        try:
+            delay_df = pd.DataFrame(Departure.objects.values('id',
+            'line_number',
+            'direction',
+            'station_id',
+            'delay'))
+
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+
+            delay_df = delay_df.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
+            delay_df = delay_df.sort_values('delay', ascending=False)
+
+            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
+            delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+
+            delay_df = delay_df[['Name mit Ort', 'delay']]
+
+            delay_dict = delay_df.to_dict('records')
+
+            return JsonResponse({'delays':delay_dict})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -258,7 +355,7 @@ def delay_at_station(request):
 @api_view(['GET'])
 def delay_at_station(request):
 
-    """departure_list
+    """delay_at_station
     description:
         * GET: returns a list of all delays of trains
 
@@ -280,17 +377,15 @@ def delay_at_station(request):
             delay_df = delay_df.sort_values('delay', ascending=False)
 
             stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            print(stations_info_df)
             delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+
             delay_df = delay_df[['Name mit Ort', 'delay']]
-            delay_df
-            print(delay_df)
+            
+
             delay_dic = delay_df.to_dict('records')
-            logger.info(type(delay_dic))
 
-
-            logger.info(delay_dic)
             return JsonResponse({'delays':delay_dic})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -299,7 +394,7 @@ def delay_at_station(request):
 @api_view(['GET'])
 def propability_at_station(request, station: str):
 
-    """departure_list
+    """propability_at_station
     description:
         * GET: returns a list of all delays of trains
 
@@ -324,16 +419,11 @@ def propability_at_station(request, station: str):
             delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
 
             delay_df = delay_df.loc[delay_df['Name mit Ort'] == station, ['Name mit Ort', 'delay']]
-
-
-
             
-            delay_dic = delay_df.to_dict('records')
-            logger.info(type(delay_dic))
+            delay_dict = delay_df.to_dict('records')
 
-
-            logger.info(delay_dic)
-            return JsonResponse({'propability':delay_dic})
+            return JsonResponse({'propability':delay_dict})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -342,7 +432,7 @@ def propability_at_station(request, station: str):
 @api_view(['GET'])
 def propability_at_stations(request):
 
-    """departure_list
+    """propability_at_stations
     description:
         * GET: returns a list of all delays of trains
 
@@ -361,21 +451,18 @@ def propability_at_stations(request):
             'station_id',
             'delay'))
 
-            delay_df = delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-            delay_df = delay_df.sort_values('delay', ascending=False)
+            delay_series = delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
+            delay_series = delay_series.sort_values('delay', ascending=False)
 
             stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+            delay_series = delay_series.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
 
-            delay_df = delay_df[['Name mit Ort', 'delay']]
-            delay_df
-            print(delay_df)
-            delay_dic = delay_df.to_dict('records')
-            logger.info(type(delay_dic))
+            delay_series = delay_series[['Name mit Ort', 'delay']]
 
+            delay_dic = delay_series.to_dict('records')
 
-            logger.info(delay_dic)
             return JsonResponse({'propability':delay_dic})
+        
         except Exception as e:
             logger.info(e)
     else:
