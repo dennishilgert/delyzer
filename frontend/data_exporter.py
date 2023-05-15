@@ -4,6 +4,7 @@ import requests
 from models.avg_time_delay_data import AvgTimeDelay
 from models.avg_line_delay_data import AvgLineDelay
 from models.avg_station_delay_data import AvgStationDelay
+from models.line_data import Line
 
 from logger import setup_logger
 
@@ -43,13 +44,13 @@ class vvsData:
             print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
 
-    def get_avg_station_delay(self) -> List[AvgLineDelay]:
+    def get_avg_station_delay(self, line) -> List[AvgLineDelay]:
         self.logger.info('Get station data')
         response = requests.get(self.url + "delay/stations", timeout=10)
         if response.status_code == 200:
             self.logger.info('Request to backend was successful')
             data = response.json()
-            delay_data = data['delays']
+            delay_data = data['delays'][:10]
             try:
                 avg_station_delays = [AvgStationDelay(item['Station'], item['delay']) for item in delay_data]
             except ValueError:
@@ -61,7 +62,7 @@ class vvsData:
             return None
 
     
-    def get_avg_time_delay(self) -> List[AvgLineDelay]:
+    def get_avg_time_delay(self, line) -> List[AvgLineDelay]:
         self.logger.info('Get time data')
         response = requests.get(self.url + "delay/times", timeout=10)
         if response.status_code == 200:
@@ -79,3 +80,19 @@ class vvsData:
             print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
 
+
+def get_lines(self) -> List[AvgLineDelay]:
+        self.logger.info('Get lines')
+        response = requests.get(self.url + "lines", timeout=10)
+        if response.status_code == 200:
+            self.logger.info('Request to backend was successful')
+            data = response.json()['lines']
+            try:
+                lines = [Line(item['line_number'], item['direction']) for item in data]
+            except ValueError:
+                self.logger.error('Failed to create AvgStationDelay list. Propably wrong data format.')
+            return lines
+        else:
+            self.logger.error('Failed when trying to get data from backend')
+            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
+            return None

@@ -6,8 +6,10 @@ from interface.plotter_interface import PlotterInterface
 
 class Plotter(PlotterInterface):
 
-    def __init__(self, ax, logger):
+    def __init__(self, ax, button_list, initial_line, logger):
+        self.current_line = initial_line
         self.ax = ax
+        self.button_list = button_list
         self.data_getter = vvsData(logger)
         self.logger = logger
 
@@ -28,7 +30,11 @@ class Plotter(PlotterInterface):
         * Test that the x-axis labels correspond to the line numbers.
         * Test that the y-axis values represent the average delay in minutes.
     """
+        for btn in self.button_list:
+            btn.set_visible(False)
+
         data = self.data_getter.get_avg_line_delay()
+
         line_and_delay = [(obj.line_number, obj.delay) for obj in data]
         line_delay_dict = {}
         for line, delay in line_and_delay:
@@ -51,7 +57,7 @@ class Plotter(PlotterInterface):
         self.logger.info('Ploted line delay data')
 
 
-    def plot_avg_station_delay(self):
+    def plot_avg_station_delay(self, new_line='no new line given'):
         """
         Plots the average delay per station using the data from the dataGetter.
 
@@ -67,7 +73,12 @@ class Plotter(PlotterInterface):
             * Test that the x-axis labels correspond to the station IDs.
             * Test that the y-axis values represent the average delay in minutes.
         """
-        data = self.data_getter.get_avg_station_delay()
+        if new_line != 'no new line given':
+            self.current_line = new_line        #Change the current line. Needed in every ploting function.
+
+        for btn in self.button_list:
+            btn.set_visible(True)
+        data = self.data_getter.get_avg_station_delay(self.current_line)
         station_and_delay = [(obj.station, obj.delay) for obj in data]
         station_delay_dict = {}
         for station, delay in station_and_delay:
@@ -93,7 +104,7 @@ class Plotter(PlotterInterface):
 
 
 
-    def plot_avg_time_delay(self):
+    def plot_avg_time_delay(self, new_line='no new line given'):
         """
         Plots the average delay over the course of a day, with data points for each half-hour increment.
 
@@ -110,10 +121,16 @@ class Plotter(PlotterInterface):
             * Test that the x-axis ticks are displayed in 3-hour intervals.
             * Test that the x-axis tick labels are formatted correctly ("HH:MM").
         """
-        data = self.data_getter.get_avg_time_delay()
+
+        if new_line != 'no new line given':
+            self.current_line = new_line        #Change the current line. Needed in every ploting function.
+
+        for btn in self.button_list:
+            btn.set_visible(True)
+        data = self.data_getter.get_avg_time_delay(self.current_line)
         time_and_delay = [(datetime.strptime(obj.time, '%Y-%m-%dT%H:%M:%S'), obj.delay) for obj in data]
 
-        time_and_delay.sort(key=lambda x: x[0])  # Sortiere nach Zeit, um sicherzustellen, dass die Daten in der richtigen Reihenfolge angezeigt werden
+        time_and_delay.sort(key=lambda x: x[0])  # Make sure, data is corectly sorted
         x = [time for time, _ in time_and_delay]
         y = [delay for _, delay in time_and_delay]
 
@@ -122,15 +139,15 @@ class Plotter(PlotterInterface):
         self.ax.set_xlabel("Uhrzeit")
         self.ax.set_ylabel("Verspätung in Minuten")
 
-        # Setze die x-Achsen-Ticks in 3-Stunden-Schritten
+        # X-axes to 3h steps
         hours = mdates.HourLocator(interval=3)
         self.ax.xaxis.set_major_locator(hours)
 
-        # Format für die x-Achsen-Ticks (nur Stunden anzeigen)
+        # X-axes only shows hours and minutes
         hour_fmt = mdates.DateFormatter('%H:%M')
         self.ax.xaxis.set_major_formatter(hour_fmt)
 
-        # Drehen der x-Achsen-Ticks für bessere Lesbarkeit
+        # Turn labels
         self.ax.tick_params(axis='x', rotation=45)
 
         self.ax.figure.canvas.draw()

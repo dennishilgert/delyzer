@@ -16,6 +16,7 @@
 - Pandas
 - vvspy
 - pylint
+- matplotlib
 
 ## Installation
 
@@ -44,10 +45,17 @@ python manage.py createsuperuser      # Create the superuser account for /admin 
 python manage.py collect_data [--observe-station <station-id> OR --observe-line <line-name>] --clear <true|false>
 ```
 
+## Frontend
+- tkinter is required
+
+```bash
+python frontend/app.py                # Start frontend
+```
+
 ## Useful commands
 
 ```bash
-python manage.py runserver            # Run server
+python manage.py runserver            # Run server 
 ```
 ```bash
 python manage.py makemigrations       # Generate migrations after making changes on models
