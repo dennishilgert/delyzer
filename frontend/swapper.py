@@ -1,7 +1,7 @@
 from plotter import Plotter
 class Swapper:
     
-    def __init__(self, ax, logger) -> None:
+    def __init__(self, ax, button_list, initial_line, logger) -> None:
         """
     Initializes the instance with a provided matplotlib axes and a Plotter object.
 
@@ -20,7 +20,7 @@ class Swapper:
         self.ax = ax
         self.func_pointer = 0
         self.plots = []
-        self.plotter = Plotter(self.ax, logger)
+        self.plotter = Plotter(self.ax, button_list, initial_line, logger)
 
         for attr_name in dir(self.plotter):
             attr = getattr(self.plotter, attr_name)
@@ -61,3 +61,6 @@ class Swapper:
             self.func_pointer += 1
 
         self.plots[self.func_pointer]()
+
+    def switch_line(self, new_line):
+        self.plots[self.func_pointer](new_line)
