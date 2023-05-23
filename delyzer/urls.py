@@ -33,5 +33,6 @@ urlpatterns = [
     path('propability/stations', views.propability_at_stations),
     path('propability/station/<str:station>', views.propability_at_station),
     path('propability/line/<str:line>/<str:direction>', views.propability_of_line),
+    path('propability/lines', views.propability_of_lines),
 
 ]

@@ -507,3 +507,40 @@ def propability_of_line(request, line, direction):
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
+
+@api_view(['GET'])
+def propability_of_lines(request):
+
+    """propability_of_lines
+    description:
+        * GET: returns a list of all delays of trains
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        try:
+            delay_df = pd.DataFrame(Departure.objects.values('id',
+            'line_number',
+            'direction',
+            'delay'))
+
+            delay_series = delay_df.groupby(['line_number','direction'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
+            delay_series = delay_series.sort_values('delay', ascending=False)
+
+            
+            delay_dict = delay_series.to_dict('records')
+
+            return JsonResponse({'propability':delay_dict})
+        
+        except Exception as e:
+            logger.info(e)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
