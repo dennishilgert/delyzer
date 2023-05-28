@@ -53,7 +53,7 @@ python manage.py collect_data [--observe-station <station-id> OR --observe-line 
 . .venv/bin/activate                  # Unix - Activate virtual python 
 ```
 ```bash
-python manage.py runserver      # Create the superuser account
+python manage.py runserver      # Start the Server
 ```
 
 
