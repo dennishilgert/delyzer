@@ -50,10 +50,10 @@ python manage.py collect_data [--observe-station <station-id> OR --observe-line 
 
 ## Start Backend
 ```bash
-# activate venv
-. .venv/bin/activate
-# run server
-python manage.py runserver
+. .venv/bin/activate                  # Unix - Activate virtual python 
+```
+```bash
+python manage.py runserver      # Create the superuser account
 ```
 
 
