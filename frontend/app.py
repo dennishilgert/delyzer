@@ -2,11 +2,9 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
-from swapper import Swapper
+from plotter import Swapper
 from logger import setup_logger
-
-from models.line_data import Line
-import random
+from plotter import VvsData
 
 
 
@@ -41,13 +39,10 @@ class MainWindow:
 
         self.figure, self.ax = plt.subplots()
         plt.subplots_adjust(bottom=0.33, top=0.83, left=0.4)
-
-        lines = []
-        for _ in range(20):
-            random_line = random.choice(['s1','s2','s3','s4','s5'])  # Zufällige Liniennummer zwischen 1 und 100
-            random_direction = random.choice(['Nord', 'Süd', 'Ost', 'West'])  # Zufällige Richtung
-            lines.append(Line(random_line, random_direction))
-
+        data_exporter = VvsData(self.logger)
+        lines = data_exporter.get_lines()
+        
+        
         #Define bitton positions
         left_button_ax = self.figure.add_axes([0.45, 0.05, 0.1, 0.075])
         right_button_ax = self.figure.add_axes([0.75, 0.05, 0.1, 0.075])

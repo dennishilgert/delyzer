@@ -13,6 +13,10 @@ class PlotterInterface(ABC):
     @abstractmethod
     def plot_avg_station_delay(self):
         pass
+
+    @abstractmethod
+    def plot_avg_station_delay(self):
+        pass
     __all__ = ["PlotterInterface"]
 
     
