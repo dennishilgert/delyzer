@@ -1,3 +1,11 @@
+"""
+Get, plot and switch between plots.
+
+Tests:
+    *Test if all classes are correct and creatable.
+    *Test if if switching between Plooter functions work with an Swapper object.
+"""
+
 from datetime import datetime
 import matplotlib.dates as mdates
 from interface.plotter_interface import PlotterInterface
@@ -8,6 +16,7 @@ import requests
 from models.avg_time_delay_data import AvgTimeDelay
 from models.avg_line_delay_data import AvgLineDelay
 from models.avg_station_delay_data import AvgStationDelay
+from models.avg_station_risk_data import AvgStationRisk
 from models.line_data import Line
 
 
@@ -63,6 +72,24 @@ class VvsData:
             self.logger.error('Failed when trying to get data from backend')
             print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
+        
+    def get_avg_station_risk(self, line) -> List[AvgStationRisk]:
+        self.logger.info('Get station risk data')
+        response = requests.get(self.url + "propability/line/"+line.line_number + '/' + line.direction, timeout=10)
+        if response.status_code == 200:
+            print(response)
+            self.logger.info('Request to backend was successful')
+            data = response.json()
+            delay_data = data['propability'][:10]
+            try:
+                avg_station_delays = [AvgStationRisk(item['line_number'], item['delay']) for item in delay_data]
+            except ValueError:
+                self.logger.error('Failed to create AvgStationRisk list. Propably wrong data format.')
+            return avg_station_delays
+        else:
+            self.logger.error('Failed when trying to get data from backend')
+            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
+            return None
 
 
 
@@ -104,6 +131,20 @@ class VvsData:
 
 
 class Plotter(PlotterInterface):
+
+    """
+    Plots different graphs and takes data from VvsData.
+
+    Args:
+    *ax: graph to plot in
+    *button_list: buttons to switch lines
+    *initial_line: line to plot first
+    *logger: logger
+
+    Tests:
+    *Test if it is possible to plot test data to the graph.
+    *Test if lists of the models are createt correctly.
+    """
 
     def __init__(self, ax, button_list, initial_line, logger):
         self.current_line = initial_line
@@ -201,6 +242,49 @@ class Plotter(PlotterInterface):
         self.ax.figure.canvas.draw()
         self.logger.info('Ploted station delay data')
 
+    
+    def plot_avg_station_risk(self, new_line='no new line given'):
+        """
+        Plots the average risk per station using the data from the dataGetter.
+        Args:
+            Uses ax from the MainWindow
+        Side Effects:
+            * Retrieves average station delay data using the dataGetter.
+            * Plots the average delay per station using matplotlib.
+        Tests:
+            * Test that the function correctly plots the average delay per station.
+            * Test that the x-axis labels correspond to the station IDs.
+            * Test that the y-axis values represent the average delay in minutes.
+        """
+        if new_line != 'no new line given':
+            self.current_line = new_line        #Change the current line. Needed in every line specific ploting function.
+
+        for btn in self.button_list:
+            btn.set_visible(True)
+        data = self.data_getter.get_avg_station_risk(self.current_line)
+        station_and_risk = [(obj.station, obj.risk) for obj in data]
+        station_risk_dict = {}
+        for station, risk in station_and_risk:
+            if station in station_risk_dict:
+                station_risk_dict[station].append(risk)
+            else:
+                station_risk_dict[station] = [risk]
+        station_and_avg_risk = []
+        for station, risk in station_risk_dict.items():
+            avg_risk = sum(risk) / len(risk)
+            station_and_avg_risk.append((station, avg_risk))
+        station_and_avg_risk.sort(key=lambda x: x[1], reverse=True)
+        x = [station_id for station_id, _ in station_and_avg_risk]
+        for station in station_and_avg_risk:
+            print(station)
+        y = [avg_delay for _, avg_delay in station_and_avg_risk]
+        self.ax.bar(x, y)
+        self.ax.set_title("Durchschnittliches Verspätungsrisiko")
+        self.ax.set_xlabel("Station")
+        self.ax.set_ylabel("Risiko in %")
+        self.ax.figure.canvas.draw()
+        self.logger.info('Ploted station risk data')
+
 
 
     def plot_avg_time_delay(self, new_line='no new line given'):
@@ -255,6 +339,21 @@ class Plotter(PlotterInterface):
 
 
 class Swapper:
+
+    """
+    Swap between different Graphs.
+
+    Args:
+        Args:
+        *ax: graph to plot in
+        *button_list: buttons to switch lines
+        *initial_line: line to plot first
+        *logger: logger
+    
+    Tests:
+        *Test if data is printable into ax
+        *Test if functions are always called with the right args.
+    """
     
     def __init__(self, ax, button_list, initial_line, logger) -> None:
         """
