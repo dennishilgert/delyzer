@@ -48,6 +48,14 @@ python manage.py createsuperuser      # Create the superuser account for /admin 
 python manage.py collect_data [--observe-station <station-id> OR --observe-line <line-name>] --clear <true|false>
 ```
 
+## Start Backend
+```bash
+. .venv/bin/activate                  # Unix - Activate virtual python 
+```
+```bash
+python manage.py runserver      # Start the Server
+```
+
 
 ## Useful commands
 - tkinter is required
