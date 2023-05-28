@@ -10,7 +10,7 @@ Function views
 Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
+Including another URLconf 
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
@@ -30,7 +30,7 @@ urlpatterns = [
     path('delay/times/<str:line>/<str:direction>', views.line_delay_at_time),
     path('delay/stations', views.delay_at_station),
     path('delay/stations/<str:line>/<str:direction>', views.line_delay_at_station),
-    path('propability/stations', views.propability_at_stations),
+     path('propability/stations', views.propability_at_stations),
     path('propability/station/<str:station>', views.propability_at_station),
     path('propability/stations/<str:line>/<str:direction>', views.propability_at_stations_of_line),
     path('propability/line/<str:line>/<str:direction>', views.propability_of_line),

@@ -1,6 +1,20 @@
 import logging
 
 def setup_logger():
+    """
+    Sets up a logger named "frontend" that logs both to the console (stream) and a file ('frontend.log'). The logger is set at the INFO level.
+    
+    Args:
+        None.
+    
+    Returns:
+        logger (logging.Logger): A Logger object to be used for logging messages.
+        
+    Tests:
+        *Ensure that the function returns a Logger object
+        *Ensure that the file handler is added to the logger
+    """
+
     logger = logging.getLogger("frontend")
     logger.setLevel(logging.INFO)
     

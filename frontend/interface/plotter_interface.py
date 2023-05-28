@@ -15,7 +15,7 @@ class PlotterInterface(ABC):
         pass
 
     @abstractmethod
-    def plot_avg_station_delay(self):
+    def plot_avg_station_risk(self):
         pass
     __all__ = ["PlotterInterface"]
 

@@ -6,6 +6,8 @@
     - Use snake_case for files, functions and variables
     - Use PascalCase for classes
 - Use single quotes (except doc-strings)
+- Declare private variables with __variable
+- Use self-explainatory naming for functions and variables
 - Comments and doc strings have to be written in english
 - Everything that will be displayed to the user has to be written in german
 
@@ -17,6 +19,7 @@
 - vvspy
 - pylint
 - matplotlib
+- tkinter
 
 ## Installation
 
