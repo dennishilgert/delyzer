@@ -544,3 +544,47 @@ def propability_of_lines(request):
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
+
+@api_view(['GET'])
+def propability_at_stations_of_line(request, line, direction):
+
+    """propability_of_lines
+    description:
+        * GET: returns a list of all delays of trains
+
+    Returns:
+        _type_: HttpResponse
+    
+    tests:
+        * Test that the API returns a list of lines.
+        * Test that the API returns the correct number of lines.
+        * Test that the API returns the expected data for each line.
+    """
+    
+    if request.method == 'GET':
+        try:
+            delay_df = pd.DataFrame(Departure.objects.values('id',
+            'line_number',
+            'direction',
+            'station_id',
+            'delay'))
+
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
+            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+
+            delay_series = delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
+            delay_series = delay_series.sort_values('delay', ascending=False)
+
+            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
+            delay_series = delay_series.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+
+            delay_series = delay_series[['Name mit Ort', 'delay']]
+
+            delay_dict = delay_series.to_dict('records')
+
+            return JsonResponse({'propability':delay_dict})
+        
+        except Exception as e:
+            logger.info(e)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
