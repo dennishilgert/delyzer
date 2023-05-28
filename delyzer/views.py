@@ -1,5 +1,4 @@
 import datetime
-import json
 from .models import Departure
 from .serializers import DepartureSerializer
 from rest_framework.decorators import api_view
@@ -9,6 +8,7 @@ from rest_framework import status
 import pandas as pd
 import logging
 
+from .utils.filter import Filter
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ def departure_list(request):
             departures_data = Departure.objects.all()
             serializer = DepartureSerializer(departures_data, many=True)
             return JsonResponse({'departures':serializer.data})
+        
         except Exception as e:
             logger.info(e)
     else:
@@ -88,12 +89,10 @@ def lines(request):
     
     if request.method == 'GET':
         try:
-            lines_data = Departure.objects.values('line_number',
+            lines_df = pd.DataFrame(Departure.objects.values('line_number',
             'id',
             'direction',
-            'line_name')
-
-            lines_df = pd.DataFrame(lines_data)
+            'line_name'))
 
             lines_df = lines_df.drop_duplicates(subset=['line_number','direction'])
             lines_df = lines_df.sort_values(['line_number','direction'])
@@ -132,12 +131,12 @@ def stations(request):
             stations_df_unique = stations_df.drop_duplicates(subset='station_id')
             stations_df_unique = stations_df_unique.reset_index(drop = True)
             
-            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            stations_df_unique = stations_df_unique.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
+            stations_df_unique = Filter.join_station_name(stations_df_unique)
 
-            stations_df_sub = stations_df_unique['Name mit Ort']
+            stations_df_sub = pd.DataFrame(stations_df_sub['Name mit Ort'])
 
             stations_dict = stations_df_sub.to_dict()
+
 
             return JsonResponse({'stations':stations_dict})
         
@@ -170,8 +169,7 @@ def lines_by_delay(request):
             'delay',
             'line_name'))
 
-            delay_df = delay_df.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(2)
-            delay_df = delay_df.sort_values('delay', ascending=False)
+            delay_df = Filter.by_delay(delay_df)
             
             delay_dict = delay_df.to_dict('records')
 
@@ -206,11 +204,9 @@ def line_by_delay(request, line, direction):
             'delay',
             'line_name'))
             
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+            delay_df = Filter.by_line(delay_df, line, direction)
 
-            delay_df = delay_df.groupby(['line_number','direction'], as_index=False).agg({'delay': 'mean'}).round(2)
-            delay_df = delay_df.sort_values('delay', ascending=False)
+            delay_df = Filter.by_delay(delay_df)
 
             delay_dict = delay_df.to_dict('records')
 
@@ -246,12 +242,7 @@ def delay_at_time(request):
             'line_name',
             'planned_departure_time'))
             
-            delay_df['planned_departure_time'] = delay_df['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
-            delay_df.set_index('planned_departure_time', inplace=True)
-
-            delay_df = delay_df['delay'].resample('30min').mean().round(2).reset_index().ffill()
-            
-            delay_df.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
+            delay_df = Filter.by_time(delay_df)
 
             delay_dict = delay_df.to_dict('records')
             
@@ -287,15 +278,9 @@ def line_delay_at_time(request, line, direction):
             'line_name',
             'planned_departure_time'))
 
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+            delay_df = Filter.by_line(delay_df, line, direction)
 
-            delay_df['planned_departure_time'] = delay_df['planned_departure_time'].apply(lambda x: datetime.datetime.combine(datetime.datetime.today(), x))
-            delay_df.set_index('planned_departure_time', inplace=True)
-
-            delay_df = delay_df['delay'].resample('30min').mean().round(2).reset_index().ffill()
-            
-            delay_df.rename(columns={'planned_departure_time':'timeslot_start'}, inplace=True)
+            delay_df = Filter.by_time(delay_df)
 
             delay_dict = delay_df.to_dict('records')
             
@@ -332,16 +317,9 @@ def line_delay_at_station(request, line, direction):
             'station_id',
             'delay'))
 
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+            delay_df = Filter.by_line(delay_df, line, direction)
 
-            delay_df = delay_df.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
-            delay_df = delay_df.sort_values('delay', ascending=False)
-
-            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
-
-            delay_df = delay_df[['Name mit Ort', 'delay']]
+            delay_df = Filter.delay_at_station(delay_df)
 
             delay_dict = delay_df.to_dict('records')
 
@@ -373,13 +351,8 @@ def delay_at_station(request):
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'station_id',
             'delay'))
-            delay_df = delay_df.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
-            delay_df = delay_df.sort_values('delay', ascending=False)
 
-            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
-
-            delay_df = delay_df[['Name mit Ort', 'delay']]
+            delay_df = Filter.delay_at_station(delay_df)
             
 
             delay_dic = delay_df.to_dict('records')
@@ -413,12 +386,9 @@ def propability_at_station(request, station: str):
             'station_id',
             'delay'))
 
-            delay_df = pd.DataFrame(delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2))
+            delay_df = Filter.propability_at_station(delay_df)
 
-            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
-
-            delay_df = delay_df.loc[delay_df['Name mit Ort'] == station, ['Name mit Ort', 'delay']]
+            delay_df = delay_df.loc[delay_df['Name mit Ort'] == station]
             
             delay_dict = delay_df.to_dict('records')
 
@@ -451,15 +421,9 @@ def propability_at_stations(request):
             'station_id',
             'delay'))
 
-            delay_series = delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-            delay_series = delay_series.sort_values('delay', ascending=False)
+            delay_df = Filter.propability_at_station(delay_df)
 
-            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            delay_series = delay_series.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
-
-            delay_series = delay_series[['Name mit Ort', 'delay']]
-
-            delay_dic = delay_series.to_dict('records')
+            delay_dic = delay_df.to_dict('records')
 
             return JsonResponse({'propability':delay_dic})
         
@@ -491,14 +455,14 @@ def propability_of_line(request, line, direction):
             'direction',
             'delay'))
 
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+            delay_df = Filter.by_line(delay_df, line, direction)
 
-            delay_series = delay_df.groupby(['line_number','direction'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-            delay_series = delay_series.sort_values('delay', ascending=False)
+            delay_df = Filter.propability_of_line(delay_df)
 
-            
-            delay_dict = delay_series.to_dict('records')
+            if delay_df.empty:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            delay_dict = delay_df.to_dict('records')
 
             return JsonResponse({'propability':delay_dict})
         
@@ -531,11 +495,10 @@ def propability_of_lines(request):
             'direction',
             'delay'))
 
-            delay_series = delay_df.groupby(['line_number','direction'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-            delay_series = delay_series.sort_values('delay', ascending=False)
+            delay_df = Filter.propability_of_line(delay_df)
 
             
-            delay_dict = delay_series.to_dict('records')
+            delay_dict = delay_df.to_dict('records')
 
             return JsonResponse({'propability':delay_dict})
         
@@ -569,18 +532,11 @@ def propability_at_stations_of_line(request, line, direction):
             'station_id',
             'delay'))
 
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
-            delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
+            delay_df = Filter.by_line(delay_df, line, direction)
 
-            delay_series = delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-            delay_series = delay_series.sort_values('delay', ascending=False)
+            delay_df = Filter.propability_at_station(delay_df)
 
-            stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
-            delay_series = delay_series.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
-
-            delay_series = delay_series[['Name mit Ort', 'delay']]
-
-            delay_dict = delay_series.to_dict('records')
+            delay_dict = delay_df.to_dict('records')
 
             return JsonResponse({'propability':delay_dict})
         
