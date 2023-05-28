@@ -12,11 +12,11 @@ class Command(BaseCommand):
 
 
     def __init__(self) -> None:
-        self.observe_line: str = ''
-        self.station_ids: list
+        self.__observe_line: str = ''
+        self.__station_ids: list
 
-        self.scheduler = sched.scheduler(time.time, time.sleep)
-        self.intervall = 12
+        self.__scheduler = sched.scheduler(time.time, time.sleep)
+        self.__intervall = 12
 
 
 
@@ -63,12 +63,12 @@ class Command(BaseCommand):
 
         observe_line = options.get('observe_line')
         if observe_line:
-            self.observe_line = observe_line
-            station_ids = self.get_stations(observe_line)
+            self.__observe_line = observe_line
+            station_ids = self.get_stations_by_line(observe_line)
             if not station_ids:
                 logger.error('Please provide a valid line number')
                 return
-            self.station_ids = station_ids
+            self.__station_ids = station_ids
         
         observe_station = options.get('observe_station')
         if observe_station:
@@ -76,9 +76,9 @@ class Command(BaseCommand):
             if not station_valid:
                 logger.error('Please provide a valid station id')
                 return
-            self.station_ids = [observe_station]
+            self.__station_ids = [observe_station]
 
-        if not self.station_ids:
+        if not self.__station_ids:
             logger.error('Please provide a line or specific station id')
             return
 
@@ -92,14 +92,14 @@ class Command(BaseCommand):
         logger.info('Observe station: -' if not observe_station else 'Observe station: ' + observe_station)
 
         try:
-            self.event = self.scheduler.enter(0, 1, self.fetch_data, (self.scheduler,))
-            self.scheduler.run()
+            self.__scheduler.enter(0, 1, self.fetch_data, (self.__scheduler,))
+            self.__scheduler.run()
         except KeyboardInterrupt:
             logger.info('Data collection has been stopped')
 
 
 
-    def get_stations(self, line: str) -> list:
+    def get_stations_by_line(self, line: str) -> list:
         """
         Returns a data frame with all stops of the line. This means:
 
@@ -126,6 +126,7 @@ class Command(BaseCommand):
         return stations['Nummer (API)'].tolist()
     
 
+
     def validate_station_id(self, station_id: str) -> bool:
         """
         Checks if a given station id is existent
@@ -142,7 +143,6 @@ class Command(BaseCommand):
         """
         stations_df = pd.read_csv('vvs_data.csv')
         station = stations_df.loc[stations_df['Nummer'].astype(str).str.match(station_id)]
-        print(station)
         return station['Nummer'].tolist().__len__() > 0
 
 
@@ -160,22 +160,25 @@ class Command(BaseCommand):
             scheduler (sched.scheduler): Scheduler
 
         Tests:
-            * On observe-station - provide an invalid station-id: Function should 
-            * Set the station_ids
+            * Provide an invalid station id in __station_ids: Function should log a warning and continue with the next station id
+            * Provide valid station ids in __station_ids: Function should save all the departures related to the given station ids
         """
 
         logger.debug('Data collection: Running fetch')
-        self.current_scheduler_event = scheduler.enter(self.intervall, 1, self.fetch_data, (scheduler,))
+        scheduler.enter(self.__intervall, 1, self.fetch_data, (scheduler,))
 
-        for station_id in self.station_ids:
+        for station_id in self.__station_ids:
             departures = get_departures(station_id, limit=100)
+            if not departures:
+                logger.warn('Data collection: No departures were returned from station ' + station_id)
+                continue
             logger.debug('Data collection: Mapping fetched data')
             for departure in departures:
                 # If departure is not in real time skip this entry
                 if departure.serving_line.real_time == False:
                     continue
                 # If departure does not belong to the observed line skip this entry
-                if self.observe_line and not departure.serving_line.number == self.observe_line:
+                if self.__observe_line and not departure.serving_line.number == self.__observe_line:
                     continue
                 # Map the data of the departure to the data fields to be saved
                 data = self.map_data(departure)
@@ -198,6 +201,7 @@ class Command(BaseCommand):
             * Pass in a departure that doesn't have the required fields: Function should throw an error
             * Pass in a departure that satisfies the required fields: Function should return the mapped object
         """
+        
         data = {}
         data['station_id'] = departure.stop_id
         data['destination_id'] = departure.serving_line.dest_id
@@ -214,15 +218,16 @@ class Command(BaseCommand):
 
     def serialize_data(self, data: dict) -> None:
         """
-        Checks if the data has all required fields to save to the database
+        Checks if the data has all required fields to save to the database and then saves to the database
 
         Args:
             data (dict): Data to be serialized
 
         Tests:
-            * Pass in data that doesn't have the required fields: Function should throw an error
+            * Pass in data that doesn't have the required fields: Function should log a warning message (error not needed because corrupt data is not our fault)
             * Pass in data that does have all required fields: Function should save the data to the database
         """
+
         serializer = DepartureSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

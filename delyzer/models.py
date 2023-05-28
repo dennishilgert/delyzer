@@ -2,6 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 class Departure(models.Model):
+  """
+  Database model to save a departure
+  """
+
   station_id = models.IntegerField(default=-1)
   destination_id = models.IntegerField(default=-1)
   direction = models.CharField(max_length=128, default='')
