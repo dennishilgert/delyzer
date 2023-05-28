@@ -1,4 +1,3 @@
-import datetime
 from .models import Departure
 from .serializers import DepartureSerializer
 from rest_framework.decorators import api_view
@@ -67,6 +66,8 @@ def departure_detail(request, id: int):
             return JsonResponse(serializer.data)
         except Exception as e:
             logger.info(e)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
@@ -133,7 +134,7 @@ def stations(request):
             
             stations_df_unique = Filter.join_station_name(stations_df_unique)
 
-            stations_df_sub = pd.DataFrame(stations_df_sub['Name mit Ort'])
+            stations_df_sub = pd.DataFrame(stations_df_unique['Name mit Ort'])
 
             stations_dict = stations_df_sub.to_dict()
 
@@ -459,11 +460,8 @@ def propability_of_line(request, line, direction):
 
             delay_df = Filter.propability_of_line(delay_df)
 
-            if delay_df.empty:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-
             delay_dict = delay_df.to_dict('records')
-
+            
             return JsonResponse({'propability':delay_dict})
         
         except Exception as e:
@@ -511,9 +509,9 @@ def propability_of_lines(request):
 @api_view(['GET'])
 def propability_at_stations_of_line(request, line, direction):
 
-    """propability_of_lines
+    """propability_at_stations_of_line
     description:
-        * GET: returns a list of all delays of trains
+        * GET: returns a list of station delays for the specified line
 
     Returns:
         _type_: HttpResponse

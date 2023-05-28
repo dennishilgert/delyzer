@@ -30,7 +30,7 @@ urlpatterns = [
     path('delay/times/<str:line>/<str:direction>', views.line_delay_at_time),
     path('delay/stations', views.delay_at_station),
     path('delay/stations/<str:line>/<str:direction>', views.line_delay_at_station),
-     path('propability/stations', views.propability_at_stations),
+    path('propability/stations', views.propability_at_stations),
     path('propability/station/<str:station>', views.propability_at_station),
     path('propability/stations/<str:line>/<str:direction>', views.propability_at_stations_of_line),
     path('propability/line/<str:line>/<str:direction>', views.propability_of_line),

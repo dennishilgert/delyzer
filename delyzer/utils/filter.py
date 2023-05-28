@@ -1,9 +1,12 @@
 import pandas as pd
+import datetime
+import logging
 
+logger = logging.getLogger(__name__)
 
 class Filter:
 
-    def by_line(delay_df, line, direction):
+    def by_line(delay_df:pd.DataFrame, line, direction):
         delay_df = pd.DataFrame(delay_df.loc[delay_df['line_number'] == line])
         delay_df = pd.DataFrame(delay_df.loc[delay_df['direction'] == direction])
 
@@ -27,47 +30,53 @@ class Filter:
 
         return delay_df
 
-    def join_station_name(delay_series:pd.Series):
+    def join_station_name(delay_df:pd.DataFrame):
         stations_info_df = pd.read_csv('vvs_data.csv', sep=',', encoding='utf-8')
 
-        delay_df = pd.DataFrame(delay_series)
+        delay_df = delay_df.set_index("station_id")
 
         delay_df = delay_df.join(stations_info_df.set_index('Nummer'), on='station_id', how="left")
 
-        delay_series = pd.Series(delay_df)
+        return delay_df
 
-        return delay_series
-
-    def delay_at_station(self, delay_df:pd.DataFrame):
+    def delay_at_station(delay_df:pd.DataFrame):
         
         delay_df = delay_df.groupby(['station_id'], as_index=False).agg({'delay': 'mean'}).round(2)
-        delay_df = delay_df.sort_values('delay', ascending=False)
+        #delay_series = delay_series.sort_values('delay')
 
-        delay_series = self.join_station_name(delay_series)
 
-        delay_series = delay_series[['Name mit Ort', 'delay']]
-        delay_df = pd.DataFrame(delay_series)
+        if not delay_df.empty:
+
+            delay_df = Filter.join_station_name(delay_df)
+        
+            delay_df = delay_df[['Name mit Ort', 'delay']]
+        
+
+            delay_df = delay_df.sort_values('delay', ascending=False)
 
         return delay_df
     
-    def propability_at_station(self, delay_df:pd.DataFrame):
+    def propability_at_station(delay_df:pd.DataFrame) -> pd.DataFrame:
         
         delay_series = delay_df.groupby(['station_id'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-        delay_series = delay_series.sort_values('delay', ascending=False)
 
-        delay_series = self.join_station_name(delay_series)
-
-        delay_series = delay_series[['Name mit Ort', 'delay']]
-        
         delay_df = pd.DataFrame(delay_series)
+
+        if not delay_df.empty:
+
+            delay_df = Filter.join_station_name(delay_df)
+        
+            delay_df = delay_df[['Name mit Ort', 'delay']]
+        
+
+            delay_df = delay_df.sort_values('delay', ascending=False)
 
         return delay_df
         
     def propability_of_line(delay_df:pd.DataFrame):
         
         delay_series = delay_df.groupby(['line_number','direction'], as_index=False)['delay'].apply(lambda delay: ((delay>2).sum()/len(delay))*100).round(2)
-        delay_series = delay_series.sort_values('delay', ascending=False)
+        delay_df = pd.DataFrame(delay_series).sort_values('delay', ascending=False)
 
-        delay_df = pd.DataFrame(delay_series)
 
         return delay_df
