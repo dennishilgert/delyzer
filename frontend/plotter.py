@@ -82,7 +82,7 @@ class VvsData:
             data = response.json()
             delay_data = data['propability'][:10]
             try:
-                avg_station_delays = [AvgStationRisk(item['Name mit '], item['delay']) for item in delay_data]
+                avg_station_delays = [AvgStationRisk(item['Name mit Ort'], item['delay']) for item in delay_data]
             except ValueError:
                 self.logger.error('Failed to create AvgStationRisk list. Propably wrong data format.')
             return avg_station_delays
