@@ -87,7 +87,7 @@ class Command(BaseCommand):
             Departure.objects.all().delete()
 
         logger.info('Data collection has been started')
-        logger.info(f'Clear: ' + clear)
+        logger.info('Clear: ' + str(clear))
         logger.info('Observe line: -' if not observe_line else 'Observe line: ' + observe_line)
         logger.info('Observe station: -' if not observe_station else 'Observe station: ' + observe_station)
 
