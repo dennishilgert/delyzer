@@ -75,14 +75,14 @@ class VvsData:
         
     def get_avg_station_risk(self, line) -> List[AvgStationRisk]:
         self.logger.info('Get station risk data')
-        response = requests.get(self.url + "propability/line/"+line.line_number + '/' + line.direction, timeout=10)
+        response = requests.get(self.url + "propability/stations/"+line.line_number + '/' + line.direction, timeout=10)
         if response.status_code == 200:
             print(response)
             self.logger.info('Request to backend was successful')
             data = response.json()
             delay_data = data['propability'][:10]
             try:
-                avg_station_delays = [AvgStationRisk(item['line_number'], item['delay']) for item in delay_data]
+                avg_station_delays = [AvgStationRisk(item['Name mit '], item['delay']) for item in delay_data]
             except ValueError:
                 self.logger.error('Failed to create AvgStationRisk list. Propably wrong data format.')
             return avg_station_delays
