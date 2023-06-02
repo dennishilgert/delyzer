@@ -60,7 +60,7 @@ python manage.py collect_data --observe-line S1
 . .venv/bin/activate                  # Unix - Activate virtual python 
 ```
 ```bash
-python manage.py runserver      # Start the Server
+python manage.py runserver            # Start the Server
 ```
 
 
