@@ -1,5 +1,7 @@
 # Delyzer
-
+Statistical aevaluation of delays in the Vvs network.
+Delyzer is an application to observe the line you need so that you can set your alarm as late as possible.
+Late (high risk) is counted as a delay > 3 minutes.
 ## Contributors
 - Matthias Schneider  -   {{MatrikelNummerHier}}
     - Frontend
