@@ -1,5 +1,10 @@
 # Delyzer
 
+## Contributors
+Matthias Schneider  -   {{MatrikelNummerHier}}
+Samuel Matzeit      -   {{MatrikelNummerHier}}
+Dennis Hilgert      -   {{MatrikelNummerHier}}
+
 ## Setup
 ### Installation
 
