@@ -63,7 +63,7 @@ def departure_list(request):
 
     if request.method == 'GET':
         try:
-            logger.info("request for departure_list")
+            logger.info("GET request for departure_list")
 
             departures_data = Departure.objects.all()
             serializer = DepartureSerializer(departures_data, many=True)
@@ -118,7 +118,7 @@ def departure_detail(request, id: int):
     
     if request.method == 'GET':
         try:
-            logger.info("request for departure_detail")
+            logger.info("GET request for departure_detail")
 
             departure_data = Departure.objects.get(pk=id)
 
@@ -170,7 +170,7 @@ def lines(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for lines")
+            logger.info("GET request for lines")
 
             lines_df = pd.DataFrame(Departure.objects.values('line_number',
             'id',
@@ -226,7 +226,7 @@ def stations(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for stations")
+            logger.info("GET request for stations")
             stations_df = pd.DataFrame(Departure.objects.values('station_id'))
 
             stations_df_unique = stations_df.drop_duplicates(subset='station_id')
@@ -287,7 +287,7 @@ def lines_by_delay(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for lines_by_delay")
+            logger.info("GET request for lines_by_delay")
 
             delay_df = pd.DataFrame(Departure.objects.values('line_number',
             'id',
@@ -344,7 +344,7 @@ def line_by_delay(request, line, direction):
     
     if request.method == 'GET':
         try:
-            logger.info("request for line_by_delay")
+            logger.info("GET request for line_by_delay")
 
             delay_df = pd.DataFrame(Departure.objects.values('line_number',
             'id',
@@ -407,7 +407,7 @@ def delay_at_time(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for delay_at_time")
+            logger.info("GET request for delay_at_time")
 
             delay_df = pd.DataFrame(Departure.objects.values('line_number',
             'id',
@@ -466,7 +466,7 @@ def line_delay_at_time(request, line, direction):
     
     if request.method == 'GET':
         try:
-            logger.info("request for line_delay_at_time")
+            logger.info("GET request for line_delay_at_time")
 
             delay_df = pd.DataFrame(Departure.objects.values('line_number',
             'id',
@@ -533,7 +533,7 @@ def line_delay_at_station(request, line, direction):
     
     if request.method == 'GET':
         try:
-            logger.info("request for line_delay_at_station")
+            logger.info("GET request for line_delay_at_station")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'line_number',
@@ -595,7 +595,7 @@ def delay_at_station(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for delay_at_station")
+            logger.info("GET request for delay_at_station")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'station_id',
@@ -650,7 +650,7 @@ def propability_at_station(request, station: str):
     
     if request.method == 'GET':
         try:
-            logger.info("request for propability_at_station")
+            logger.info("GET request for propability_at_station")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'station_id',
@@ -710,7 +710,7 @@ def propability_at_stations(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for propability_at_stations")
+            logger.info("GET request for propability_at_stations")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'station_id',
@@ -766,7 +766,7 @@ def propability_of_line(request, line, direction):
     
     if request.method == 'GET':
         try:
-            logger.info("request for propability_of_line")
+            logger.info("GET request for propability_of_line")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'line_number',
@@ -830,7 +830,7 @@ def propability_of_lines(request):
     
     if request.method == 'GET':
         try:
-            logger.info("request for propability_of_lines")
+            logger.info("GET request for propability_of_lines")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'line_number',
@@ -893,7 +893,7 @@ def propability_at_stations_of_line(request, line, direction):
     
     if request.method == 'GET':
         try:
-            logger.info("request for propability_at_stations_of_line")
+            logger.info("GET request for propability_at_stations_of_line")
 
             delay_df = pd.DataFrame(Departure.objects.values('id',
             'line_number',
