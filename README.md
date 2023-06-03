@@ -2,8 +2,11 @@
 
 ## Contributors
 - Matthias Schneider  -   {{MatrikelNummerHier}}
+    - Frontend
 - Samuel Matzeit      -   {{MatrikelNummerHier}}
+    - Backend
 - Dennis Hilgert      -   {{MatrikelNummerHier}}
+    - Data Collection
 
 ## Setup
 ### Installation
