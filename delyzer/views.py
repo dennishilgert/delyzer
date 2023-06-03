@@ -1,3 +1,4 @@
+# Samuel Matzeit
 from .models import Departure
 from .serializers import DepartureSerializer
 from rest_framework.decorators import api_view
