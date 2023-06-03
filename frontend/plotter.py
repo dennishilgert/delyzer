@@ -1,5 +1,6 @@
+"Developer: Matthias Schneider"
 """
-Get, plot and switch between plots.
+Get data, plot and switch between plots.
 
 Tests:
     *Test if all classes are correct and creatable.

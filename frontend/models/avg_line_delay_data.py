@@ -1,3 +1,4 @@
+"Developer: Matthias Schneider"
 
 class AvgLineDelay:
     def __init__(self, name, direction, delay):

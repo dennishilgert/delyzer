@@ -1,3 +1,4 @@
+"Developer: Matthias Schneider"
 import logging
 
 def setup_logger():

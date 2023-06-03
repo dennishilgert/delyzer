@@ -1,3 +1,5 @@
+"Developer: Matthias Schneider"
+
 from abc import ABC, abstractmethod
 
 class PlotterInterface(ABC):
