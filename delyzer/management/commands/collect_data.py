@@ -1,3 +1,5 @@
+# Dennis Hilgert
+
 from django.core.management.base import BaseCommand, CommandParser
 from vvspy import get_departures
 from delyzer.models import Departure

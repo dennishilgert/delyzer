@@ -40,7 +40,8 @@ python manage.py createsuperuser      # Create the superuser account for /admin 
 ```bash
 python manage.py collect_data [--observe-station <station-id> OR --observe-line <line-name>] [--clear True]
 
-# Please note that you have to lookup the station id of the target station in the vvs_data.csv file for the following command (an automatic search feature could be implemented in the future)
+# Please note that you have to lookup the station id of the target station with the following command first or observe a line
+python manage.py find_station_id --station-name Stadtmitte
 # If you want to observe a station and collect the departure data of e.g. Stadtmitte, then use
 python manage.py collect_data --observe-station 5006056
 # If you want to observe all stations of a line and collect the departure data of e.g. S1, then use
