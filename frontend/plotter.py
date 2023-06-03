@@ -53,7 +53,6 @@ class VvsData:
             return avg_line_delays
         else:
             self.logger.error('Failed when trying to get data from backend')
-            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
 
     def get_avg_station_delay(self, line) -> List[AvgLineDelay]:
@@ -70,14 +69,12 @@ class VvsData:
             return avg_station_delays
         else:
             self.logger.error('Failed when trying to get data from backend')
-            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
         
     def get_avg_station_risk(self, line) -> List[AvgStationRisk]:
         self.logger.info('Get station risk data')
         response = requests.get(self.url + "propability/stations/"+line.line_number + '/' + line.direction, timeout=10)
         if response.status_code == 200:
-            print(response)
             self.logger.info('Request to backend was successful')
             data = response.json()
             delay_data = data['propability'][:10]
@@ -88,7 +85,6 @@ class VvsData:
             return avg_station_delays
         else:
             self.logger.error('Failed when trying to get data from backend')
-            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
 
 
@@ -101,7 +97,6 @@ class VvsData:
             self.logger.info('Request to backend was successful')
             data = response.json()
             delay_data = data['times']
-            print(delay_data)
             try:
                 avg_time_delays = [AvgTimeDelay(item['timeslot_start'], item['delay']) for inner_list in delay_data for item in inner_list]
             except ValueError:
@@ -109,7 +104,6 @@ class VvsData:
             return avg_time_delays
         else:
             self.logger.error('Failed when trying to get data from backend')
-            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
 
 
@@ -126,7 +120,6 @@ class VvsData:
             return lines
         else:
             self.logger.error('Failed when trying to get data from backend')
-            print("Fehler beim Abrufen von Daten. HTTP-Statuscode: ", response.status_code)
             return None
 
 
@@ -233,8 +226,7 @@ class Plotter(PlotterInterface):
         station_and_avg_delay.sort(key=lambda x: x[1], reverse=True)
         x = [station_id for station_id, _ in station_and_avg_delay]
         for station in station_and_avg_delay:
-            print(station)
-        y = [avg_delay for _, avg_delay in station_and_avg_delay]
+            y = [avg_delay for _, avg_delay in station_and_avg_delay]
         self.ax.bar(x, y)
         self.ax.set_title("Durchschnittliche Verspätung pro Station")
         self.ax.set_xlabel("Station")
@@ -276,8 +268,7 @@ class Plotter(PlotterInterface):
         station_and_avg_risk.sort(key=lambda x: x[1], reverse=True)
         x = [station_id for station_id, _ in station_and_avg_risk]
         for station in station_and_avg_risk:
-            print(station)
-        y = [avg_delay for _, avg_delay in station_and_avg_risk]
+            y = [avg_delay for _, avg_delay in station_and_avg_risk]
         self.ax.bar(x, y)
         self.ax.set_title("Durchschnittliches Verspätungsrisiko")
         self.ax.set_xlabel("Station")
