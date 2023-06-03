@@ -331,7 +331,7 @@ class Plotter(PlotterInterface):
         self.ax.xaxis.set_major_formatter(hour_fmt)
 
         # Turn labels
-        self.ax.tick_params(axis='x', rotation=45)
+        self.ax.tick_params(axis='x', rotation=90)
 
         self.ax.figure.canvas.draw()
         self.logger.info('Ploted time delay data')

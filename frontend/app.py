@@ -40,6 +40,7 @@ class MainWindow:
         self.figure, self.ax = plt.subplots()
         plt.subplots_adjust(bottom=0.33, top=0.83, left=0.4)
         data_exporter = VvsData(self.logger)
+        self.figure.canvas.manager.set_window_title('Delyzer')
         lines = data_exporter.get_lines()
         
         
