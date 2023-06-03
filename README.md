@@ -4,10 +4,13 @@ Delyzer is an application to observe the line you need so that you can set your 
 Late (high risk) is counted as a delay > 3 minutes.
 ## Contributors
 - Matthias Schneider  -   {{MatrikelNummerHier}}
-    - Frontend
+    - Data retrieval
+    - graphic representation
 - Samuel Matzeit      -   {{MatrikelNummerHier}}
-    - Backend
+    - Data preparation
+    - REST-Backend
 - Dennis Hilgert      -   {{MatrikelNummerHier}}
+    - Django setup
     - Data Collection
 
 ## Setup
